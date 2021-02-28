@@ -4,6 +4,16 @@
 
   (memory (export "myMemory") 1)
 
+  (func $translate (param $offset i32) (param $delta f64)
+    (f64.store
+      (local.get $offset)
+      (f64.add
+        (f64.load (local.get $offset))
+        (local.get $delta)
+      )
+    )
+  )
+
   (func (export "translatePoints") (param $length i32) (param $dx f64) (param $dy f64)
     (local $offset i32) ;; starts at zero
 
@@ -16,14 +26,7 @@
     )
 
     (loop
-      ;; Translate x value by $dx.
-      (f64.store
-        (local.get $offset)
-        (f64.add
-          (f64.load (local.get $offset))
-          (local.get $dx)
-        )
-      )
+      (call $translate (local.get $offset) (local.get $dx))
 
       ;; Advance $offset to get next y value.
       (local.set $offset (i32.add (local.get $offset) (i32.const 8)))
